@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q-GPT Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .chat-container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .chat-header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-bottom: 2px solid #ddd;
+        }
+        .chat-header h2 {
+            margin: 0;
+        }
+        .chat-messages {
+            padding: 20px;
+        }
+        .chat-messages .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .chat-messages .message .text {
+            font-size: 16px;
+        }
+        .chat-messages .message .text span {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .chat-input {
+            padding: 10px;
+            border-top: 2px solid #ddd;
+        }
+        .chat-input input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        .chat-input button[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .chat-input button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Q-GPT Chatbot</h2>
+        </div>
+        <div class="chat-messages">
+            <div class="message">
+                <div class="text"><span>Q-GPT:</span> Welcome to the Q-GPT chatbot. How can I assist you today?</div>
+            </div>
+        </div>
+        <form class="chat-input" id="textGenForm">
+            <input type="text" id="inputText" name="inputText" placeholder="Ask a question..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        function isValidString(string) {
+            // Check if the string is not empty
+            return string.trim().length > 0;
+        }
+
+        document.getElementById('textGenForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var inputText = document.getElementById('inputText').value;
+
+            try {
+                fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ input_text: inputText }),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        var message = data.generated_texts ? `<div class="message"><div class="text"><span>Q-GPT:</span> ${data.generated_texts}</div></div>` : '<div class="message"><div class="text"><span>Q-GPT:</span> No text generated or an error occurred.</div></div>';
+                        document.querySelector('.chat-messages').innerHTML += message;
+                    })
+                    .catch(error => {
+                        console.error('Error in fetch:', error);
+                        var errorMessage = '<div class="message"><div class="text"><span>Q-GPT:</span> Error: ' + (error.message || error.toString()) + '</div></div>';
+                        document.querySelector('.chat-messages').innerHTML += errorMessage;
+                    });
+            } catch (error) {
+                console.error('Unexpected error:', error);
+                var errorMessage = '<div class="message"><div class="text"><span>Q-GPT:</span> Unexpected Error: ' + error.message + '</div></div>';
+                document.querySelector('.chat-messages').innerHTML += errorMessage;
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+
+# Ignore virtual environment
+venv/
+env/
+
+# Ignore IDE specific files
+.idea/
+*.swp
+*.sublime-workspace
